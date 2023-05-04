@@ -12,16 +12,6 @@ def main():
 	isExist = os.path.exists(r"..\Exported\DrugBank")
 	if not isExist: os.makedirs(r"..\Exported\DrugBank")
 
-	# Batch Parameters
-	batchDrugBank = False # Generate Edge List for Historical DrugBank Data (Batch)
-	batchDBNetMeasure = False # Requires Edge Lists 
-	# Generates Edge List (DrugBank Files)
-	if batchDrugBank:
-		batchDrugBank()
-	# Network Analysis (DrugBank Files)
-	if batchDBNetMeasure:
-		batchDBNetMeasure()
-
 	# Single file processing
 	drugbank_file = r"..\DataSources\DrugBank\5.1.10.xml" 
 	# Generates DrugBank Edge List
@@ -36,13 +26,12 @@ def main():
 	# Network Analysis
 	G = nx.read_edgelist(edgelistDrugBank, delimiter=',', nodetype=int) # Read the network
 
-	#netM.characterize_network_from_net(G, exp_edgelistDrugBank)
-	
-
+	netM.characterize_network_from_net(G, edgelistDrugBank)
 
 	print('done!')
 
 
+# Batch Generates Edge List (DrugBank Files)
 def batchDrugBank():
 	pathDrugBank = r"..\DataSources\DrugBank\*.xml" # Names are expected to contain only the version number
 	for file in glob.glob(pathDrugBank):
@@ -52,6 +41,7 @@ def batchDrugBank():
 		db1.export()
 		del db1
 
+# Batch Network Analysis (DrugBank Files)
 def batchDBNetMeasure():
 	pathDrugBankEdgeList = r"..\Exported\DrugBank\*.csv"
 	for edgelistfile in glob.glob(pathDrugBankEdgeList):

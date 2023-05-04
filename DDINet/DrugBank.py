@@ -159,4 +159,4 @@ class DrugBank:
         self.df_drugs.to_csv(base_exp_path+"_drugs.csv", index = False)
         self.df_drugsSynonyms.to_csv(base_exp_path+"_drugsSynonyms.csv", index = False)
         self.df_interactions.to_csv(base_exp_pathInteractions+"_interactions.csv", header = False, index = False)
-        self.edgelistfile = base_exp_path+"_interactions.csv"
+        self.edgelistfile = base_exp_pathInteractions+"_interactions.csv"
