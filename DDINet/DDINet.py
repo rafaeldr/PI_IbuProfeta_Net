@@ -12,21 +12,26 @@ def main():
 	isExist = os.path.exists(r"..\Exported\DrugBank")
 	if not isExist: os.makedirs(r"..\Exported\DrugBank")
 
-	# Single file processing
-	drugbank_file = r"..\DataSources\DrugBank\5.1.10.xml" 
+	# Single file processing mode
+	version = "5.1.10"
+	drugbank_file = os.path.join(r"..\DataSources\DrugBank", "{}.xml".format(version))
+	
 	# Generates DrugBank Edge List
-	db1 = db.DrugBank(drugbank_file,"5.1.10")
-	db1.preProcess()
-	db1.export()
-
-	# Load Pre-processed Edge Lists (Version According "Matching" Procedure)
-	edgelistDrugBank = db1.edgelistfile
-	#edgelistDrugBank = r"..\Exported\DrugBank\exp_5.1.10_interactions.csv" 
+	edgelistDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv".format(version))
+	if not os.path.isfile(edgelistDrugBank):
+		db1 = db.DrugBank(drugbank_file,"5.1.10")
+		db1.preProcess()
+		db1.export()
+		edgelistDrugBank = db1.edgelistfile
 
 	# Network Analysis
 	G = nx.read_edgelist(edgelistDrugBank, delimiter=',', nodetype=int) # Read the network
 
-	netM.characterize_network_from_net(G, edgelistDrugBank)
+	# Network Measures
+	netMeasuresDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv.measures.txt".format(version))
+	if not os.path.isfile(netMeasuresDrugBank):
+		netM.characterize_network_from_net(G, edgelistDrugBank)
+
 
 	print('done!')
 
