@@ -4,6 +4,7 @@ import pandas as pd
 import os
 #import matplotlib.pyplot as plt
 import NetMeasures as netM
+import LinkPrediction as lp
 import glob
 
 def main():
@@ -32,6 +33,12 @@ def main():
 	if not os.path.isfile(netMeasuresDrugBank):
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
+	print("Initializing Link Prediction")
+	lp1 = lp.LinkPrediction(G)
+	l_result = lp1.jaccard_coefficient()
+
+	for u, v, p in l_result:
+		print(f"({u}, {v}) -> {p:.8f}")
 
 	print('done!')
 

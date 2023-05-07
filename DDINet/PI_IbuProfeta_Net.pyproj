@@ -25,6 +25,7 @@
   <ItemGroup>
     <Compile Include="DDINet.py" />
     <Compile Include="DrugBank.py" />
+    <Compile Include="LinkPrediction.py" />
     <Compile Include="NetMeasures.py" />
   </ItemGroup>
   <ItemGroup>
