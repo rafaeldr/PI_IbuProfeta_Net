@@ -1,4 +1,5 @@
 import networkx as nx
+import pandas as pd
   
 class LinkPrediction:
 
@@ -23,7 +24,13 @@ class LinkPrediction:
 	http://www.cs.cornell.edu/home/kleinber/link-pred.pdf
 	"""
 	def jaccard_coefficient(self):
-		return nx.jaccard_coefficient(self.G)
+		result = nx.jaccard_coefficient(self.G)
+		result = list(result)
+		result_correlation = result.copy()
+		result.sort(key=lambda x: (x[-1], -x[0], -x[1]), reverse = True) # sort by last tuple element (in list)
+		result_correlation.sort(key=lambda x: (x[0], x[1])) # For correlation
+		print('done')
+		# return
 
 
 	# Adamic Adar Index

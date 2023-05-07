@@ -33,9 +33,13 @@ def main():
 	if not os.path.isfile(netMeasuresDrugBank):
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
+	# Link Prediction
 	print("Initializing Link Prediction")
+	G = nx.karate_club_graph() # TEST
 	lp1 = lp.LinkPrediction(G)
+	comm = nx.community.greedy_modularity_communities(G)
 	l_result = lp1.jaccard_coefficient()
+	
 
 	for u, v, p in l_result:
 		print(f"({u}, {v}) -> {p:.8f}")

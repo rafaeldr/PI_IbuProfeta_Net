@@ -1,6 +1,5 @@
 import xmltodict
 import pandas as pd
-import numpy as np
 import collections
 
 silent = False          # Display track of progress info (when False)
