@@ -3,9 +3,25 @@ import pandas as pd
   
 class LinkPrediction:
 
+	has_community_info = False
+	dfResult = pd.DataFrame()
+	dfCorrelation = pd.DataFrame()
+
+	
 	def __init__(self, G) -> None:
 		self.G = G
+		print(self.G)
+		self.expected_preds = int(((self.G.number_of_nodes()*(self.G.number_of_nodes()-1))/2)-self.G.number_of_edges())
+		print("Expected Edge Predictions (per Algorithm): "+str(self.expected_preds))
 
+	def prepare_communities(self, comm):
+		self.Gcomm = self.G.copy()
+		add_community_info(self.Gcomm, comm)
+		self.has_community_info = True
+		
+	def predict(self):
+		self.jaccard_coefficient()
+		pass
 
 	# Resource Allocation Index
 	"""
@@ -16,7 +32,6 @@ class LinkPrediction:
 	def resource_allocation_index(self):
 		nx.resource_allocation_index(self.G)
 
-
 	# Jaccard Coefficient
 	"""
 	D. Liben-Nowell, J. Kleinberg.
@@ -24,13 +39,10 @@ class LinkPrediction:
 	http://www.cs.cornell.edu/home/kleinber/link-pred.pdf
 	"""
 	def jaccard_coefficient(self):
-		result = nx.jaccard_coefficient(self.G)
-		result = list(result)
-		result_correlation = result.copy()
-		result.sort(key=lambda x: (x[-1], -x[0], -x[1]), reverse = True) # sort by last tuple element (in list)
-		result_correlation.sort(key=lambda x: (x[0], x[1])) # For correlation
-		print('done')
-		# return
+		result_raw = nx.jaccard_coefficient(self.G)
+		[result, result_correlation] = process_lp_result(result_raw)
+		self.processing_dataframe(result, result_correlation, 'Jaccard Coefficient')
+
 
 
 	# Adamic Adar Index
@@ -65,7 +77,8 @@ class LinkPrediction:
 	Default: delta=0.001, community='community'
 	"""
 	def within_inter_cluster(self):
-		nx.within_inter_cluster(self.G)
+		if self.has_community_info:
+			nx.within_inter_cluster(self.G)
 
 
 	# Community Common Neighbor (expect community information)
@@ -76,10 +89,37 @@ class LinkPrediction:
 	ACM, New York, NY, USA, 607-608. http://doi.acm.org/10.1145/2187980.2188150
 	"""
 	def community_common_neighbor(self):
-		nx.cn_soundarajan_hopcroft(self.G)
+		if self.has_community_info:
+			nx.cn_soundarajan_hopcroft(self.G)
 
 
 	# Community Resource Allocation
 	""" Obs: Same as before. """
 	def community_resource_allocation(self):
-		nx.ra_index_soundarajan_hopcroft(self.G)
+		if self.has_community_info:
+			nx.ra_index_soundarajan_hopcroft(self.G)
+
+
+	def processing_dataframe(self, result, result_correlation, col_name):
+		dfTemp = pd.DataFrame(result, columns = ['a', 'b', col_name])
+		dfTempCorrelation = pd.DataFrame(result_correlation, columns = [col_name])
+		self.dfResult = pd.concat([self.dfResult, dfTemp], axis = 1)
+		self.dfCorrelation = pd.concat([self.dfCorrelation, dfTempCorrelation], axis=1)
+
+
+# Static functions
+
+def process_lp_result(result_raw):
+	''' List and sort data for result presentation and correlation analysis '''
+	result = list(result_raw)
+	result_correlation = result.copy()
+	result.sort(key=lambda x: (x[-1], -x[0], -x[1]), reverse = True) # sort by last tuple element (in list)
+	result_correlation.sort(key=lambda x: (x[0], x[1])) # For correlation
+	result_correlation = [result_correlation[i][2] for i in range(len(result_correlation))]
+	return [result, result_correlation]
+
+
+def add_community_info(G, communities):
+	for c, v_set in enumerate(communities):
+		for v in v_set:
+			G.nodes[v]['community'] = c

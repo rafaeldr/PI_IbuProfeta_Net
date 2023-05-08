@@ -34,12 +34,11 @@ def main():
 	if not os.path.isfile(netMeasuresDrugBank):
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
-	# Link Prediction
-	print("Initializing Link Prediction")
-	#G = nx.karate_club_graph() # TEST
-	lp1 = lp.LinkPrediction(G)
-	
-	# Calculate Modularity
+	# FOR TESTING SIMULATIONS
+	G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
+		
+	# Calculate Communities
+	print("Calculating (or importing) Community Detection Info")
 	commFile = os.path.join(r"..\Exported\DrugBank", "exp_{}_communities.bin".format(version))
 	if not os.path.isfile(commFile):
 		comm = nx.community.greedy_modularity_communities(G)
@@ -48,10 +47,16 @@ def main():
 	else:
 		with open(commFile, 'rb') as file:
 			comm = pickle.load(file)
-			
+	
+	
+	# Link Prediction Phase
+	print("Initializing Link Prediction")
+	lp1 = lp.LinkPrediction(G)
+	lp1.prepare_communities(comm)
+	lp1.predict()
 
 
-	l_result = lp1.jaccard_coefficient()
+	l_result = nx.cn_soundarajan_hopcroft(Gcomm, community = 'community')
 	
 
 	for u, v, p in l_result:
@@ -77,5 +82,7 @@ def batchDBNetMeasure():
 		print('Calculating Network Measures for file: '+edgelistfile)
 		netM.characterize_network_from_file(edgelistfile)
 
+
 if __name__ == '__main__':
+
 	main()
