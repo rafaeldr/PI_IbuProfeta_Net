@@ -2,6 +2,7 @@ import networkx as nx
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
+import time
   
 class LinkPrediction:
 
@@ -10,8 +11,9 @@ class LinkPrediction:
 	dfCorrelation = pd.DataFrame()
 
 	
-	def __init__(self, G) -> None:
+	def __init__(self, G, base_exp_path = r"..\Exported\DrugBank\exp_") -> None:
 		self.G = G
+		self.base_exp_path = base_exp_path
 		print(self.G)
 		self.expected_preds = int(((self.G.number_of_nodes()*(self.G.number_of_nodes()-1))/2)-self.G.number_of_edges())
 		print("Expected Edge Predictions (per Algorithm): "+str(self.expected_preds))
@@ -22,21 +24,37 @@ class LinkPrediction:
 		self.has_community_info = True
 		
 	def predict(self):
+		start = time.time()
 		self.resource_allocation_index()
+		self.export()
 		self.jaccard_coefficient()
+		self.export()
 		self.adamic_adar_index()
+		self.export()
 		self.preferential_attachment()
+		self.export()
 		self.common_neighbor_centrality()
+		self.export()
 		if self.has_community_info:
 			self.within_inter_cluster()
+			self.export()
 			self.community_common_neighbor()
+			self.export()
 			self.community_resource_allocation()
+			self.export()
+		end = time.time()
+		print('Link Prediction Ended! Time: '+str(end-start))
 
 	def correlation_analysis(self):
+		print('Calculating Correlation Matrix')
+		start = time.time()
 		corr_matrix = self.dfCorrelation.corr()
 		sn.heatmap(corr_matrix, annot=True)
-		plt.show()
-		print('done')
+		plt.show(block=False)
+		plt.pause(0.01)
+		end = time.time()
+		print('Correlation Matrix Calculated! Time: '+str(end-start))
+
 
 	# Resource Allocation Index
 	"""
@@ -151,10 +169,10 @@ class LinkPrediction:
 		self.dfCorrelation = pd.concat([self.dfCorrelation, dfTempCorrelation], axis=1)
 
 
-	def export(self, base_exp_path):
+	def export(self):
 		# Export Link Prediction Results
-		self.dfResult.to_csv(base_exp_path+"_linkprediction.csv", index = False)
-		self.dfCorrelation.to_csv(base_exp_path+"_linkprediction_precorrelation.csv", index = False)
+		self.dfResult.to_csv(self.base_exp_path+"_linkprediction.csv", index = False)
+		self.dfCorrelation.to_csv(self.base_exp_path+"_linkprediction_precorrelation.csv", index = False)
 
 
 # Static functions

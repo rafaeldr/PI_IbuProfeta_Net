@@ -2,11 +2,12 @@ import DrugBank as db
 import networkx as nx
 import pandas as pd
 import os
-#import matplotlib.pyplot as plt
+import time
 import NetMeasures as netM
 import LinkPrediction as lp
 import glob
 import pickle
+import matplotlib.pyplot as plt
 
 def main():
 	isExist = os.path.exists(r"..\Exported")
@@ -21,7 +22,7 @@ def main():
 	# Generates DrugBank Edge List
 	edgelistDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv".format(version))
 	if not os.path.isfile(edgelistDrugBank):
-		db1 = db.DrugBank(drugbank_file,"5.1.10")
+		db1 = db.DrugBank(drugbank_file,version)
 		db1.preProcess()
 		db1.export()
 		edgelistDrugBank = db1.edgelistfile
@@ -38,29 +39,34 @@ def main():
 	#G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
 		
 	# Calculate Communities
-	print("Calculating (or importing) Community Detection Info")
 	commFile = os.path.join(r"..\Exported\DrugBank", "exp_{}_communities.bin".format(version))
 	if not os.path.isfile(commFile):
+		print("Calculating Community Detection Info")
+		start = time.time()
 		comm = nx.community.greedy_modularity_communities(G)
 		with open(commFile, 'wb') as file: # binary file
 			pickle.dump(comm,file)
+		end = time.time()
+		print('Measures Calculated! Time: '+str(end-start))
 	else:
+		print("Importing Community Detection Info")
 		with open(commFile, 'rb') as file:
 			comm = pickle.load(file)
 	
 	
 	# Link Prediction Phase
 	print("Initializing Link Prediction")
-	lp1 = lp.LinkPrediction(G)
+	base_exp_path = r"..\Exported\DrugBank\exp_"+version
+	lp1 = lp.LinkPrediction(G, base_exp_path)
 	lp1.prepare_communities(comm)
 	lp1.predict()
 	
-	base_exp_path = r"..\Exported\DrugBank\exp_"+version
-	lp1.export(base_exp_path)
 	
+	lp1.export()
 	lp1.correlation_analysis()
 
-	print('done!')
+	plt.show(block=True) # Deals with block = False (otherwise figures become unresponsive)
+	input('Press any key to finish...')
 
 
 # Batch Generates Edge List (DrugBank Files)
