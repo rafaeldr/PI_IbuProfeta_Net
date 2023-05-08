@@ -16,11 +16,11 @@ dependencies:
   - brotli=1.0.9=h8ffe710_7
   - brotli-bin=1.0.9=h8ffe710_7
   - brotlipy=0.7.0=py38h294d835_1001
-  - ca-certificates=2022.12.7=h5b45459_0
+  - ca-certificates=2023.5.7=h56e8100_0
   - cachetools=4.2.4=pyhd8ed1ab_0
   - cairo=1.16.0=hb19e0ff_1008
   - cairocffi=1.2.0=pyhd8ed1ab_0
-  - certifi=2022.12.7=pyhd8ed1ab_0
+  - certifi=2023.5.7=pyhd8ed1ab_0
   - cffi=1.14.5=py38hcd4344a_0
   - chardet=4.0.0=py38haa244fe_1
   - charset-normalizer=2.0.0=pyhd8ed1ab_0
@@ -146,6 +146,7 @@ dependencies:
   - requests=2.26.0=pyhd8ed1ab_0
   - rsa=4.7.2=pyh44b312d_0
   - scipy=1.8.1=py38h4990095_2
+  - seaborn=0.12.2=py38haa95532_0
   - send2trash=1.5.0=pyhd3eb1b0_1
   - setuptools=52.0.0=py38haa95532_0
   - six=1.16.0=pyhd3eb1b0_0
