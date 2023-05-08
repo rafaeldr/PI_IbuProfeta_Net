@@ -6,6 +6,7 @@ import os
 import NetMeasures as netM
 import LinkPrediction as lp
 import glob
+import pickle
 
 def main():
 	isExist = os.path.exists(r"..\Exported")
@@ -35,9 +36,21 @@ def main():
 
 	# Link Prediction
 	print("Initializing Link Prediction")
-	G = nx.karate_club_graph() # TEST
+	#G = nx.karate_club_graph() # TEST
 	lp1 = lp.LinkPrediction(G)
-	comm = nx.community.greedy_modularity_communities(G)
+	
+	# Calculate Modularity
+	commFile = os.path.join(r"..\Exported\DrugBank", "exp_{}_communities.bin".format(version))
+	if not os.path.isfile(commFile):
+		comm = nx.community.greedy_modularity_communities(G)
+		with open(commFile, 'wb') as file: # binary file
+			pickle.dump(comm,file)
+	else:
+		with open(commFile, 'rb') as file:
+			comm = pickle.load(file)
+			
+
+
 	l_result = lp1.jaccard_coefficient()
 	
 
