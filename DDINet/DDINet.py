@@ -35,7 +35,7 @@ def main():
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
 	# FOR TESTING SIMULATIONS
-	G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
+	#G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
 		
 	# Calculate Communities
 	print("Calculating (or importing) Community Detection Info")
@@ -54,13 +54,11 @@ def main():
 	lp1 = lp.LinkPrediction(G)
 	lp1.prepare_communities(comm)
 	lp1.predict()
-
-
-	l_result = nx.cn_soundarajan_hopcroft(Gcomm, community = 'community')
 	
-
-	for u, v, p in l_result:
-		print(f"({u}, {v}) -> {p:.8f}")
+	base_exp_path = r"..\Exported\DrugBank\exp_"+version
+	lp1.export(base_exp_path)
+	
+	lp1.correlation_analysis()
 
 	print('done!')
 
