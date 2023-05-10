@@ -36,7 +36,7 @@ def main():
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
 	# FOR TESTING SIMULATIONS
-	#G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
+	G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
 		
 	# Calculate Communities
 	commFile = os.path.join(r"..\Exported\DrugBank", "exp_{}_communities.bin".format(version))

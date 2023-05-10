@@ -3,13 +3,14 @@ import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
 import time
+import os
   
 class LinkPrediction:
 
 	has_community_info = False
 	dfResult = pd.DataFrame()
 	dfCorrelation = pd.DataFrame()
-
+	skipAlgorithms = []
 	
 	def __init__(self, G, base_exp_path = r"..\Exported\DrugBank\exp_") -> None:
 		self.G = G
@@ -24,6 +25,8 @@ class LinkPrediction:
 		self.has_community_info = True
 		
 	def predict(self):
+		self.check_previous_processed()
+		
 		start = time.time()
 		self.resource_allocation_index()
 		self.export()
@@ -174,6 +177,27 @@ class LinkPrediction:
 		self.dfResult.to_csv(self.base_exp_path+"_linkprediction.csv", index = False)
 		self.dfCorrelation.to_csv(self.base_exp_path+"_linkprediction_precorrelation.csv", index = False)
 
+	def check_previous_processed(self):
+		lpFile = self.base_exp_path+"_linkprediction.csv"
+		corrFile = self.base_exp_path+"_linkprediction_precorrelation.csv"
+		if os.path.isfile(lpFile) and os.path.isfile(corrFile):
+			self.dfResult = pd.read_csv(lpFile)
+			self.dfCorrelation = pd.read_csv(corrFile)
+			
+			# Check if files are consistent
+			if self.dfResult.shape[0] == self.expected_preds and self.dfCorrelation.shape[0] == self.expected_preds:
+				self.skipAlgorithms = list(self.dfCorrelation.columns)
+				# Check if both files have the same columns
+				temp = list(self.dfResult.columns)
+				temp = [temp[i] for i in range(len(self.dfResult.columns)) if (i+1)%3 == 0]
+				if temp != self.skipAlgorithms:
+					# files are not consistent
+					self.dfResult = pd.DataFrame()
+					self.dfCorrelation = pd.DataFrame()
+			else: # if file exists but is not consistent
+				self.dfResult = pd.DataFrame()
+				self.dfCorrelation = pd.DataFrame()
+		# return True if both files exist
 
 # Static functions
 
