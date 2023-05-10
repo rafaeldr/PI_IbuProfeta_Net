@@ -28,23 +28,31 @@ class LinkPrediction:
 		self.check_previous_processed()
 		
 		start = time.time()
-		self.resource_allocation_index()
-		self.export()
-		self.jaccard_coefficient()
-		self.export()
-		self.adamic_adar_index()
-		self.export()
-		self.preferential_attachment()
-		self.export()
-		self.common_neighbor_centrality()
-		self.export()
+		if 'Resource Allocation Index' not in self.skipAlgorithms:
+			self.resource_allocation_index()
+			self.export()
+		if 'Jaccard Coefficient' not in self.skipAlgorithms:
+			self.jaccard_coefficient()
+			self.export()
+		if 'Adamic Adar Index' not in self.skipAlgorithms:
+			self.adamic_adar_index()
+			self.export()
+		if 'Preferential Attachment' not in self.skipAlgorithms:
+			self.preferential_attachment()
+			self.export()
+		if 'Common Neighbor Centrality' not in self.skipAlgorithms:
+			self.common_neighbor_centrality()
+			self.export()
 		if self.has_community_info:
-			self.within_inter_cluster()
-			self.export()
-			self.community_common_neighbor()
-			self.export()
-			self.community_resource_allocation()
-			self.export()
+			if 'Within Inter Cluster' not in self.skipAlgorithms:
+				self.within_inter_cluster()
+				self.export()
+			if 'Community Common Neighbor' not in self.skipAlgorithms:
+				self.community_common_neighbor()
+				self.export()
+			if 'Community Resource Allocation' not in self.skipAlgorithms:
+				self.community_resource_allocation()
+				self.export()
 		end = time.time()
 		print('Link Prediction Ended! Time: '+str(end-start))
 
@@ -194,6 +202,7 @@ class LinkPrediction:
 					# files are not consistent
 					self.dfResult = pd.DataFrame()
 					self.dfCorrelation = pd.DataFrame()
+					self.skipAlgorithms = []
 			else: # if file exists but is not consistent
 				self.dfResult = pd.DataFrame()
 				self.dfCorrelation = pd.DataFrame()
