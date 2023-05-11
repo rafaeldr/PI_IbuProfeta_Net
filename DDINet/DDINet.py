@@ -16,7 +16,7 @@ def main():
 	if not isExist: os.makedirs(r"..\Exported\DrugBank")
 
 	# Single file processing mode
-	version = "5.1.10"
+	version = "5.0.2"
 	drugbank_file = os.path.join(r"..\DataSources\DrugBank", "{}.xml".format(version))
 	
 	# Generates DrugBank Edge List
@@ -36,7 +36,7 @@ def main():
 		netM.characterize_network_from_net(G, edgelistDrugBank)
 
 	# FOR TESTING SIMULATIONS
-	G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
+	#G = nx.karate_club_graph() # TEST  (Requires manual adjustment for communities bin file)
 		
 	# Calculate Communities
 	commFile = os.path.join(r"..\Exported\DrugBank", "exp_{}_communities.bin".format(version))
@@ -47,7 +47,7 @@ def main():
 		with open(commFile, 'wb') as file: # binary file
 			pickle.dump(comm,file)
 		end = time.time()
-		print('Measures Calculated! Time: '+str(end-start))
+		print('Communities Calculated! Time: '+str(end-start))
 	else:
 		print("Importing Community Detection Info")
 		with open(commFile, 'rb') as file:
