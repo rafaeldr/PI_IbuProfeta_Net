@@ -208,6 +208,11 @@ class LinkPrediction:
 				self.dfCorrelation = pd.DataFrame()
 		# return True if both files exist
 
+	def export_with_names(self, path_to_names):
+		self.dfResult = pd.read_csv(path_to_names)
+
+		pass
+
 # Static functions
 
 def process_lp_result(result_raw):
