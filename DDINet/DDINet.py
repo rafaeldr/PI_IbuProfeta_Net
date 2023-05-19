@@ -16,9 +16,10 @@ def main():
 	if not isExist: os.makedirs(r"..\Exported\DrugBank")
 
 	# Single file processing mode
-	version = "5.0.2"
+	version = "5.1.10"
 	drugbank_file = os.path.join(r"..\DataSources\DrugBank", "{}.xml".format(version))
-	
+
+
 	# Generates DrugBank Edge List
 	edgelistDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv".format(version))
 	if not os.path.isfile(edgelistDrugBank):
@@ -81,7 +82,7 @@ def batchDrugBank():
 
 # Batch Network Analysis (DrugBank Files)
 def batchDBNetMeasure():
-	pathDrugBankEdgeList = r"..\Exported\DrugBank\*.csv"
+	pathDrugBankEdgeList = r"..\Exported\DrugBank\*interactions.csv"
 	for edgelistfile in glob.glob(pathDrugBankEdgeList):
 		print('Calculating Network Measures for file: '+edgelistfile)
 		netM.characterize_network_from_file(edgelistfile)

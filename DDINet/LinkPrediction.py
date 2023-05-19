@@ -11,6 +11,7 @@ class LinkPrediction:
 	dfResult = pd.DataFrame()
 	dfCorrelation = pd.DataFrame()
 	skipAlgorithms = []
+	has_changed = True
 	
 	def __init__(self, G, base_exp_path = r"..\Exported\DrugBank\exp_") -> None:
 		self.G = G
@@ -29,28 +30,36 @@ class LinkPrediction:
 		
 		start = time.time()
 		if 'Resource Allocation Index' not in self.skipAlgorithms:
+			self.has_changed = True
 			self.resource_allocation_index()
 			self.export()
 		if 'Jaccard Coefficient' not in self.skipAlgorithms:
+			self.has_changed = True
 			self.jaccard_coefficient()
 			self.export()
 		if 'Adamic Adar Index' not in self.skipAlgorithms:
+			self.has_changed = True
 			self.adamic_adar_index()
 			self.export()
 		if 'Preferential Attachment' not in self.skipAlgorithms:
+			self.has_changed = True
 			self.preferential_attachment()
 			self.export()
 		if 'Common Neighbor Centrality' not in self.skipAlgorithms:
+			self.has_changed = True
 			self.common_neighbor_centrality()
 			self.export()
 		if self.has_community_info:
 			if 'Within Inter Cluster' not in self.skipAlgorithms:
+				self.has_changed = True
 				self.within_inter_cluster()
 				self.export()
 			if 'Community Common Neighbor' not in self.skipAlgorithms:
+				self.has_changed = True
 				self.community_common_neighbor()
 				self.export()
 			if 'Community Resource Allocation' not in self.skipAlgorithms:
+				self.has_changed = True
 				self.community_resource_allocation()
 				self.export()
 		end = time.time()
@@ -181,9 +190,10 @@ class LinkPrediction:
 
 
 	def export(self):
-		# Export Link Prediction Results
-		self.dfResult.to_csv(self.base_exp_path+"_linkprediction.csv", index = False)
-		self.dfCorrelation.to_csv(self.base_exp_path+"_linkprediction_precorrelation.csv", index = False)
+		if self.has_changed:
+			# Export Link Prediction Results
+			self.dfResult.to_csv(self.base_exp_path+"_linkprediction.csv", index = False)
+			self.dfCorrelation.to_csv(self.base_exp_path+"_linkprediction_precorrelation.csv", index = False)
 
 	def check_previous_processed(self):
 		lpFile = self.base_exp_path+"_linkprediction.csv"
@@ -191,6 +201,7 @@ class LinkPrediction:
 		if os.path.isfile(lpFile) and os.path.isfile(corrFile):
 			self.dfResult = pd.read_csv(lpFile)
 			self.dfCorrelation = pd.read_csv(corrFile)
+			self.has_changed = False
 			
 			# Check if files are consistent
 			if self.dfResult.shape[0] == self.expected_preds and self.dfCorrelation.shape[0] == self.expected_preds:
@@ -203,9 +214,11 @@ class LinkPrediction:
 					self.dfResult = pd.DataFrame()
 					self.dfCorrelation = pd.DataFrame()
 					self.skipAlgorithms = []
+					self.has_changed = True
 			else: # if file exists but is not consistent
 				self.dfResult = pd.DataFrame()
 				self.dfCorrelation = pd.DataFrame()
+				self.has_changed = True
 		# return True if both files exist
 
 	def export_with_names(self, path_to_names):

@@ -153,9 +153,9 @@ class DrugBank:
     def export(self):
         # Exporting
         if not silent: print('DrugBank - Exporting CSVs') 
-        base_exp_path = r"..\Exported\exp_"+self.version
-        base_exp_pathInteractions = r"..\Exported\DrugBank\exp_"+self.version
+        #base_exp_path = r"..\Exported\exp_"+self.version
+        base_exp_path = r"..\Exported\DrugBank\exp_"+self.version
         self.df_drugs.to_csv(base_exp_path+"_drugs.csv", index = False)
         self.df_drugsSynonyms.to_csv(base_exp_path+"_drugsSynonyms.csv", index = False)
-        self.df_interactions.to_csv(base_exp_pathInteractions+"_interactions.csv", header = False, index = False)
-        self.edgelistfile = base_exp_pathInteractions+"_interactions.csv"
+        self.df_interactions.to_csv(base_exp_path+"_interactions.csv", header = False, index = False)
+        self.edgelistfile = base_exp_path+"_interactions.csv"
