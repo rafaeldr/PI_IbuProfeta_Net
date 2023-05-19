@@ -67,15 +67,26 @@ class LinkPrediction:
 		print('Link Prediction Ended! Time: '+str(end-start))
 
 	def correlation_analysis(self):
-		print('Calculating Correlation Matrix')
+		print('Calculating Correlation Analysis')
 		start = time.time()
-		corr_matrix = self.dfCorrelation.corr()
-		sn.heatmap(corr_matrix, annot=True)
-		plt.show(block=False)
-		plt.pause(0.01)
-		end = time.time()
-		print('Correlation Matrix Calculated! Time: '+str(end-start))
+		cov_matrix = self.dfCorrelation.cov()
+		corr_matrix_pearson = self.dfCorrelation.corr() # Pearson
+		corr_matrix_spearman = self.dfCorrelation.corr(method='spearman')
+		corr_matrix_kendall = self.dfCorrelation.corr(method='kendall')
+		self.plot_matrix(cov_matrix, 'Covariance Matrix')
+		self.plot_matrix(corr_matrix_pearson, 'Pearson Correlation Matrix')
+		self.plot_matrix(corr_matrix_spearman, 'Spearman Correlation Matrix')
+		self.plot_matrix(corr_matrix_kendall, 'Kendall Correlation Matrix')
 
+		end = time.time()
+		print('Correlation Analysis Calculated! Time: '+str(end-start))
+
+	def plot_matrix(self, matrix, title = ''):
+		plt.figure()
+		plt.title(title)
+		sn.heatmap(matrix, annot=True)
+		plt.show(block=False)
+		plt.pause(0.01)		
 
 	# Resource Allocation Index
 	"""
