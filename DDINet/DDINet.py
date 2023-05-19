@@ -62,10 +62,11 @@ def main():
 	lp1.prepare_communities(comm)
 	lp1.predict()
 	
-	
 	lp1.export()
 	lp1.correlation_analysis()
+	lp1.export_with_names()
 
+	input('Close all figures to proceed...')
 	plt.show(block=True) # Deals with block = False (otherwise figures become unresponsive)
 	input('Press any key to finish...')
 

@@ -11,6 +11,7 @@ class LinkPrediction:
 	dfResult = pd.DataFrame()
 	dfCorrelation = pd.DataFrame()
 	skipAlgorithms = []
+	dict_id_to_name = dict()
 	has_changed = True
 	
 	def __init__(self, G, base_exp_path = r"..\Exported\DrugBank\exp_") -> None:
@@ -188,7 +189,6 @@ class LinkPrediction:
 		self.dfResult = pd.concat([self.dfResult, dfTemp], axis = 1)
 		self.dfCorrelation = pd.concat([self.dfCorrelation, dfTempCorrelation], axis=1)
 
-
 	def export(self):
 		if self.has_changed:
 			# Export Link Prediction Results
@@ -221,10 +221,28 @@ class LinkPrediction:
 				self.has_changed = True
 		# return True if both files exist
 
-	def export_with_names(self, path_to_names):
-		self.dfResult = pd.read_csv(path_to_names)
+	def export_with_names(self, limit = 1000):
+		self.generate_id_to_name()
+		limit = limit if limit < self.dfResult.shape[0] else self.dfResult.shape[0]
+		dfExport = self.dfResult[0:limit].copy()
+		dfExport = self.rewrite_names(dfExport)
+		dfExport.to_excel(self.base_exp_path+"_results.xlsx", index = False)
 
-		pass
+	def generate_id_to_name(self):
+		if self.dict_id_to_name == {}:
+			drug_file = self.base_exp_path+"_drugs.csv"
+			if os.path.isfile(drug_file):
+				dfDrugs = pd.read_csv(drug_file)
+				for index, row in dfDrugs.iterrows():
+					self.dict_id_to_name[row['drugbank-id']] = row['name']
+
+	def rewrite_names(self, df):
+		for i in range(len(df)): # row
+			for j in range(len(df.iloc[i])): # column
+				if (j+1)%3 != 0:
+					df.iloc[i,j] = self.dict_id_to_name[df.iloc[i,j]]
+		return df
+
 
 # Static functions
 
