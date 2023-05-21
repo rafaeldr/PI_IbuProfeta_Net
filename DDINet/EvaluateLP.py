@@ -19,7 +19,7 @@ class EvaluateLP:
 		self.df_LP_old = df_LP_old
 		self.process()
 		
-	def process(self, limit_to_top = 'full'):
+	def process(self, limit_to_top = 'new_edges'):
 
 		# Remove nodes from G_new that ARE NOT in G_old
 		nodes_new = set(self.G_new.nodes)
@@ -34,18 +34,30 @@ class EvaluateLP:
 		self.G_new.remove_edges_from(edges_to_remove)
 		# Left only edges that are new in G_new
 
+		edges_new = set(self.G_new.edges)
+		
 		if limit_to_top == 'full':
 			limit_to_top = len(self.df_LP_old)
-
-		edges_new = set(self.G_new.edges)
-
-		print('stop')
+		elif limit_to_top == 'new_edges':
+			limit_to_top = len(edges_new)
+		
+		print('')
+		print('######### Link Prediction Evaluation Module #########')
+		print('')
+		print('New edges exhibited by the model: '+str(len(edges_new)))
+		print('Limit used as TOP rank search: '+str(limit_to_top))
+		print('Full space of search: '+str(len(self.df_LP_old)))
+		print('')
 		# Foreach algorithm in df_LP_old check between edges_new
 		algs = int(self.df_LP_old.shape[1]/3)
 		for alg in range(int(self.df_LP_old.shape[1]/3)):
 			# Some arithmethic to get the right columns
 			col = 3*alg
+			print('Evaluating Predictions for Algorithm '+str(alg+1)+' of '+
+		          str(int(self.df_LP_old.shape[1]/3))+': '+self.df_LP_old.columns[col+2])
+
 			counter = 0
+			match = 0
 			start = time.time()
 			acc = 0
 
@@ -56,20 +68,28 @@ class EvaluateLP:
 				counter += 1
 				if (counter % 10 == 0): print('Edge: {}/{} \r'.format(counter, len(edges_new)), end="")
 				
-				id_LP_edge = np.where(self.df_LP_old.iloc[:,col].isin([edge[0],edge[1]]) & 
-						              self.df_LP_old.iloc[:,(col+1)].isin([edge[0],edge[1]]))[0]
+				id_LP_edge = np.where(self.df_LP_old.iloc[0:limit_to_top,col].isin([edge[0],edge[1]]) & 
+						              self.df_LP_old.iloc[0:limit_to_top,(col+1)].isin([edge[0],edge[1]]))[0]
 				if len(id_LP_edge) > 0:
 					int(id_LP_edge[0]) # should be only one
+					match = match + 1
 					# Get the LP score
 					score_LP = self.df_LP_old.iloc[id_LP_edge[0],(col+2)]
 					score_LP = (score_LP - min_score) / (max_score - min_score)
 					acc += score_LP
-			
-			alg_score = acc/len(edges_new)
-			
 			print()
+			print('')
+			print('Total matches: '+str(match))
+			print('Accumulated score: '+str(acc))
+			if limit_to_top>len(edges_new):
+				print('Average score: '+str(acc/len(edges_new)))
+			else:
+				print('Average score: '+str(acc/limit_to_top))
+			print('')
 			end = time.time()
 			print('Link Evaluation Ended! Time: '+str(end-start))
+			print('')
+			# if limit_to_top < len(edges_new) # Choose search space
 
 
 def main():
