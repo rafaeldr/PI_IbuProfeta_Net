@@ -3,6 +3,7 @@ import numpy as np
 import os
 import pickle
 import LinkPrediction as lp
+import time
 
 class EvaluateLP:
 
@@ -18,7 +19,7 @@ class EvaluateLP:
 		self.df_LP_old = df_LP_old
 		self.process()
 		
-	def process(self):
+	def process(self, limit_to_top = 'full'):
 
 		# Remove nodes from G_new that ARE NOT in G_old
 		nodes_new = set(self.G_new.nodes)
@@ -33,6 +34,9 @@ class EvaluateLP:
 		self.G_new.remove_edges_from(edges_to_remove)
 		# Left only edges that are new in G_new
 
+		if limit_to_top == 'full':
+			limit_to_top = len(self.df_LP_old)
+
 		edges_new = set(self.G_new.edges)
 
 		print('stop')
@@ -41,12 +45,31 @@ class EvaluateLP:
 		for alg in range(int(self.df_LP_old.shape[1]/3)):
 			# Some arithmethic to get the right columns
 			col = 3*alg
+			counter = 0
+			start = time.time()
+			acc = 0
+
+			max_score = self.df_LP_old.iloc[:,(col+2)].max()
+			min_score = self.df_LP_old.iloc[:,(col+2)].min()
 
 			for edge in edges_new:
-				id_LP_edge = np.where(self.df_LP_old.iloc[:,col].isin([edge[0],edge[1]]) & self.df_LP_old.iloc[:,(col+1)].isin([edge[0],edge[1]]))[0]
+				counter += 1
+				if (counter % 10 == 0): print('Edge: {}/{} \r'.format(counter, len(edges_new)), end="")
+				
+				id_LP_edge = np.where(self.df_LP_old.iloc[:,col].isin([edge[0],edge[1]]) & 
+						              self.df_LP_old.iloc[:,(col+1)].isin([edge[0],edge[1]]))[0]
 				if len(id_LP_edge) > 0:
 					int(id_LP_edge[0]) # should be only one
-
+					# Get the LP score
+					score_LP = self.df_LP_old.iloc[id_LP_edge[0],(col+2)]
+					score_LP = (score_LP - min_score) / (max_score - min_score)
+					acc += score_LP
+			
+			alg_score = acc/len(edges_new)
+			
+			print()
+			end = time.time()
+			print('Link Evaluation Ended! Time: '+str(end-start))
 
 
 def main():
