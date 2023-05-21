@@ -1,4 +1,6 @@
 import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
 import time
 
 def characterize_network_from_net(G, outFileName):
@@ -48,3 +50,53 @@ def characterize_network_from_file(edgelistfile):
     #nx.draw_networkx(G)
     #plt.pause(0.01)
     characterize_network_from_net(G, edgelistfile)
+
+def plot_degree_analysis(G):
+    degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
+    degrees = [G.degree(n) for n in G.nodes()]
+    dmax = max(degree_sequence)
+    
+    # Degree Histogram Individually
+    plt.figure()
+    unique_degrees = np.unique(degree_sequence, return_counts=True)
+    rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
+    my_cmap = plt.get_cmap("coolwarm")
+    plt.bar(*unique_degrees, width=3, color = my_cmap(rescale(unique_degrees[1])))
+    plt.title("Degree Histogram")
+    plt.xlabel("Degree")
+    plt.ylabel("# of Nodes")
+    plt.xlim([0, dmax])
+    plt.show(block=False)
+    plt.pause(0.01)
+
+    # Degree Histogram Individually
+    plt.figure()
+    plt.bar(*unique_degrees, width=3, color = my_cmap(rescale(unique_degrees[1])))
+    plt.title("Degree Histogram Log-Lin")
+    plt.xlabel("Degree")
+    plt.ylabel("# of Nodes")
+    plt.xscale('log')
+    plt.show(block=False)
+    plt.pause(0.01)
+    
+    # Degree Histogram Individually (with bins)
+    plt.figure()
+    counts, bins = np.histogram(degrees, 50)
+    plt.stairs(counts, bins)
+    #plt.hist(degrees, 50)
+    plt.title("Degree Histogram (50-bins)")
+    plt.xlabel("Degree")
+    plt.ylabel("# of Nodes")
+    plt.xlim([0, dmax])
+    plt.show(block=False)
+    plt.pause(0.01)
+
+    # Degree Rank Plot
+    plt.figure()
+    plt.plot(degree_sequence, "b-", marker="o")
+    plt.title("Degree Rank Plot")
+    plt.ylabel("Degree")
+    plt.xlabel("Rank")
+    plt.xlim([0, len(degree_sequence)])
+    plt.show(block=False)
+    plt.pause(0.01)

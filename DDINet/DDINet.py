@@ -1,6 +1,7 @@
 import DrugBank as db
 import networkx as nx
 import pandas as pd
+import numpy as np
 import os
 import time
 import NetMeasures as netM
@@ -30,6 +31,9 @@ def main():
 
 	# Network Analysis
 	G = nx.read_edgelist(edgelistDrugBank, delimiter=',', nodetype=int) # Read the network
+
+	# Plot Degree Distribution Analysis
+	netM.plot_degree_analysis(G)
 
 	# Network Measures
 	netMeasuresDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv.measures.txt".format(version))
