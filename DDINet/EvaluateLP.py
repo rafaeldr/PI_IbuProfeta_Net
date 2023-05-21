@@ -1,4 +1,5 @@
 import networkx as nx
+import numpy as np
 import os
 import pickle
 import LinkPrediction as lp
@@ -15,8 +16,36 @@ class EvaluateLP:
 		self.G_old = G_old
 		self.G_new = G_new
 		self.df_LP_old = df_LP_old
+		self.process()
 		
-		pass
+	def process(self):
+
+		# Remove nodes from G_new that ARE NOT in G_old
+		nodes_new = set(self.G_new.nodes)
+		nodes_old = set(self.G_old.nodes)
+		nodes_to_remove = nodes_new - nodes_old
+		self.G_new.remove_nodes_from(nodes_to_remove)
+
+		# Remove edges from G_new that ARE in G_old
+		edges_new = set(self.G_new.edges)
+		edges_old = set(self.G_old.edges)
+		edges_to_remove = edges_new.intersection(edges_old)
+		self.G_new.remove_edges_from(edges_to_remove)
+		# Left only edges that are new in G_new
+
+		edges_new = set(self.G_new.edges)
+
+		print('stop')
+		# Foreach algorithm in df_LP_old check between edges_new
+		algs = int(self.df_LP_old.shape[1]/3)
+		for alg in range(int(self.df_LP_old.shape[1]/3)):
+			# Some arithmethic to get the right columns
+			col = 3*alg
+
+			for edge in edges_new:
+				id_LP_edge = np.where(self.df_LP_old.iloc[:,col].isin([edge[0],edge[1]]) & self.df_LP_old.iloc[:,(col+1)].isin([edge[0],edge[1]]))[0]
+				if len(id_LP_edge) > 0:
+					int(id_LP_edge[0]) # should be only one
 
 
 
