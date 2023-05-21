@@ -104,7 +104,7 @@ def main():
 
 	eval_LP = EvaluateLP(G_old, G_new, df_LP_old)
 
-	print('test')
+	print('Done!!!')
 
 def pre_load_net(version):
 	edgelistDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv".format(version))
