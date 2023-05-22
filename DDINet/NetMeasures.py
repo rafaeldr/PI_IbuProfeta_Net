@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import powerlaw
 
 def characterize_network_from_net(G, outFileName):
 
@@ -100,3 +101,18 @@ def plot_degree_analysis(G):
     plt.xlim([0, len(degree_sequence)])
     plt.show(block=False)
     plt.pause(0.01)
+
+def check_free_scale(G):
+    degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
+    #fit = powerlaw.Fit(degree_sequence) 
+    fit = powerlaw.Fit(degree_sequence, xmin=1)
+    print('alpha= '+str(fit.alpha)+'; sigma: '+str(fit.sigma))
+
+    plt.figure()
+    fig = fit.plot_pdf(color='b', linewidth=2)
+    fit.power_law.plot_pdf(color='g', linestyle='--', ax=fig)
+    plt.show(block=False)
+    plt.pause(0.01)
+    print('stop')
+
+    

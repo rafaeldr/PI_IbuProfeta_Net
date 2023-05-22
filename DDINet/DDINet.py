@@ -35,6 +35,9 @@ def main():
 	# Plot Degree Distribution Analysis
 	netM.plot_degree_analysis(G)
 
+	# Check if the network is free scale
+	netM.check_free_scale(G)
+
 	# Network Measures
 	netMeasuresDrugBank = os.path.join(r"..\Exported\DrugBank", "exp_{}_interactions.csv.measures.txt".format(version))
 	if not os.path.isfile(netMeasuresDrugBank):
