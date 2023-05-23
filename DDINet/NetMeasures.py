@@ -113,6 +113,14 @@ def check_free_scale(G):
     fit.power_law.plot_pdf(color='g', linestyle='--', ax=fig)
     plt.show(block=False)
     plt.pause(0.01)
+    
+    # Small-worldness
+    nx.sigma(G)
+    nx.omega(G)
+    print('small-worldness')
+    print('sigma: '+str(nx.sigma(G)))
+    print('omega: '+str(nx.omega(G)))
+    
     print('stop')
 
     
