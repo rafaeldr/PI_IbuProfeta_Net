@@ -13,6 +13,7 @@ class LinkPrediction:
 	skipAlgorithms = []
 	dict_id_to_name = dict()
 	has_changed = True
+	__edges_rank_order = pd.DataFrame() # Obfuscation
 	
 	def __init__(self, G, base_exp_path = r"..\Exported\DrugBank\exp_") -> None:
 		self.G = G
@@ -98,8 +99,8 @@ class LinkPrediction:
 		alg_name = 'Resource Allocation Index'
 		print('Processing Link Prediction - Algorithm '+alg_name)
 		result_raw = nx.resource_allocation_index(self.G)
-		[result, result_correlation] = process_lp_result(result_raw)
-		self.processing_dataframe(result, result_correlation, alg_name)
+		[result, result_correlation] = self.process_lp_result(result_raw)
+		self.combine_dataframe(result, result_correlation, alg_name)
 
 	# Jaccard Coefficient
 	"""
@@ -111,8 +112,8 @@ class LinkPrediction:
 		alg_name = 'Jaccard Coefficient'
 		print('Processing Link Prediction - Algorithm '+alg_name)
 		result_raw = nx.jaccard_coefficient(self.G)
-		[result, result_correlation] = process_lp_result(result_raw)
-		self.processing_dataframe(result, result_correlation, alg_name)
+		[result, result_correlation] = self.process_lp_result(result_raw)
+		self.combine_dataframe(result, result_correlation, alg_name)
 
 
 	# Adamic Adar Index
@@ -121,8 +122,8 @@ class LinkPrediction:
 		alg_name = 'Adamic Adar Index'
 		print('Processing Link Prediction - Algorithm '+alg_name)
 		result_raw = nx.adamic_adar_index(self.G)
-		[result, result_correlation] = process_lp_result(result_raw)
-		self.processing_dataframe(result, result_correlation, alg_name)
+		[result, result_correlation] = self.process_lp_result(result_raw)
+		self.combine_dataframe(result, result_correlation, alg_name)
 
 
 	# Preferential Attachment
@@ -131,8 +132,8 @@ class LinkPrediction:
 		alg_name = 'Preferential Attachment'
 		print('Processing Link Prediction - Algorithm '+alg_name)
 		result_raw = nx.preferential_attachment(self.G)
-		[result, result_correlation] = process_lp_result(result_raw)
-		self.processing_dataframe(result, result_correlation, alg_name)
+		[result, result_correlation] = self.process_lp_result(result_raw)
+		self.combine_dataframe(result, result_correlation, alg_name)
 
 
 	# Common Neighbor Centrality
@@ -146,8 +147,8 @@ class LinkPrediction:
 		alg_name = 'Common Neighbor Centrality'
 		print('Processing Link Prediction - Algorithm '+alg_name)
 		result_raw = nx.common_neighbor_centrality(self.G)
-		[result, result_correlation] = process_lp_result(result_raw)
-		self.processing_dataframe(result, result_correlation, alg_name)
+		[result, result_correlation] = self.process_lp_result(result_raw)
+		self.combine_dataframe(result, result_correlation, alg_name)
 
 		
 	# Within Inter Cluster | ** Expect Community Information **
@@ -163,8 +164,8 @@ class LinkPrediction:
 			alg_name = 'Within Inter Cluster'
 			print('Processing Link Prediction - Algorithm '+alg_name)
 			result_raw = nx.within_inter_cluster(self.Gcomm)
-			[result, result_correlation] = process_lp_result(result_raw)
-			self.processing_dataframe(result, result_correlation, alg_name)
+			[result, result_correlation] = self.process_lp_result(result_raw)
+			self.combine_dataframe(result, result_correlation, alg_name)
 
 
 	# Community Common Neighbor | ** Expect Community Information **
@@ -179,8 +180,8 @@ class LinkPrediction:
 			alg_name = 'Community Common Neighbor'
 			print('Processing Link Prediction - Algorithm '+alg_name)
 			result_raw = nx.cn_soundarajan_hopcroft(self.Gcomm)
-			[result, result_correlation] = process_lp_result(result_raw)
-			self.processing_dataframe(result, result_correlation, alg_name)
+			[result, result_correlation] = self.process_lp_result(result_raw)
+			self.combine_dataframe(result, result_correlation, alg_name)
 
 
 	# Community Resource Allocation | ** Expect Community Information **
@@ -190,11 +191,30 @@ class LinkPrediction:
 			alg_name = 'Community Resource Allocation'
 			print('Processing Link Prediction - Algorithm '+alg_name)
 			result_raw = nx.ra_index_soundarajan_hopcroft(self.Gcomm)
-			[result, result_correlation] = process_lp_result(result_raw)
-			self.processing_dataframe(result, result_correlation, alg_name)
+			[result, result_correlation] = self.process_lp_result(result_raw)
+			self.combine_dataframe(result, result_correlation, alg_name)
 
+	def process_lp_result(self, result_raw):
+		''' List and sort data for result presentation and correlation analysis '''
+		result = list(result_raw)
+		result_correlation = result.copy()
+		result.sort(key=lambda x: (x[-1], -x[0], -x[1]), reverse = True) # sort by last tuple element (in list)
+		result_correlation.sort(key=lambda x: (x[0], x[1])) # For correlation
+		if self.__edges_rank_order.empty:
+			# Keep edges rank order for validation
+			temp = [[result_correlation[i][0], result_correlation[i][1]] for i in range(len(result_correlation))]
+			self.__edges_rank_order = pd.DataFrame(temp, columns = ['a', 'b'])
+		else:
+			# Check if edges rank order is the same
+			temp = [[result_correlation[i][0], result_correlation[i][1]] for i in range(len(result_correlation))]
+			dfTemp = pd.DataFrame(temp, columns = ['a', 'b'])
+			if not self.__edges_rank_order.equals(dfTemp):
+				print('Unexpected error: edges rank order is not the same')
+				exit(1)
+		result_correlation = [result_correlation[i][2] for i in range(len(result_correlation))]
+		return [result, result_correlation]
 
-	def processing_dataframe(self, result, result_correlation, col_name):
+	def combine_dataframe(self, result, result_correlation, col_name):
 		dfTemp = pd.DataFrame(result, columns = ['a', 'b', col_name])
 		dfTempCorrelation = pd.DataFrame(result_correlation, columns = [col_name])
 		self.dfResult = pd.concat([self.dfResult, dfTemp], axis = 1)
@@ -256,16 +276,6 @@ class LinkPrediction:
 
 
 # Static functions
-
-def process_lp_result(result_raw):
-	''' List and sort data for result presentation and correlation analysis '''
-	result = list(result_raw)
-	result_correlation = result.copy()
-	result.sort(key=lambda x: (x[-1], -x[0], -x[1]), reverse = True) # sort by last tuple element (in list)
-	result_correlation.sort(key=lambda x: (x[0], x[1])) # For correlation
-	result_correlation = [result_correlation[i][2] for i in range(len(result_correlation))]
-	return [result, result_correlation]
-
 
 def add_community_info(G, communities):
 	for c, v_set in enumerate(communities):
