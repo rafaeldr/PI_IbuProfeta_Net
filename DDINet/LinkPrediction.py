@@ -256,8 +256,9 @@ class LinkPrediction:
 			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
 			result_plot = rescale(result_plot)
 			plt.figure(fig_combined.number)
-			plt.plot(result_plot)
+			plt.plot(result_plot, label=self.dfResult.columns[col+2])
 			plt.xlim([0, len(result_plot)])
+		plt.legend(loc='upper right', shadow=True)
 		plt.show(block=False)
 		plt.pause(0.01)
 
