@@ -1,4 +1,5 @@
 import networkx as nx
+import numpy as np
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -225,6 +226,40 @@ class LinkPrediction:
 			# Export Link Prediction Results
 			self.dfResult.to_csv(self.base_exp_path+"_linkprediction.csv", index = False)
 			self.dfCorrelation.to_csv(self.base_exp_path+"_linkprediction_precorrelation.csv", index = False)
+
+	def plot_lp_analysis(self):
+		fig_combined = plt.figure()
+		plt.ylabel("Prediction Value Normalized")
+		plt.xlabel("Rank")
+		plt.title("Combined Rank Plot LP Values")
+		for alg in range(int(self.dfResult.shape[1]/3)):
+			# Some arithmethic to get the right columns
+			col = 3*alg
+			
+			print('LP Analysis for Algorithm: '+self.dfResult.columns[col+2])
+			print('Mean: '+str(self.dfResult.iloc[:,(col+2)].mean()))
+			print('Median: '+str(self.dfResult.iloc[:,(col+2)].median()))
+			print('Max: '+str(self.dfResult.iloc[:,(col+2)].max()))
+			print('Min: '+str(self.dfResult.iloc[:,(col+2)].min()))
+			print('Std: '+str(self.dfResult.iloc[:,(col+2)].std()))
+
+			# Rank Plot Prediction Values
+			result_plot = self.dfResult.iloc[:,(col+2)]
+			plt.figure()
+			plt.plot(result_plot)
+			plt.title("Rank Plot LP Values - "+self.dfResult.columns[col+2])
+			plt.xlim([0, len(result_plot)])
+			plt.show(block=False)
+			plt.pause(0.01)
+
+			# Normalize and Plot Together
+			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
+			result_plot = rescale(result_plot)
+			plt.figure(fig_combined.number)
+			plt.plot(result_plot)
+			plt.xlim([0, len(result_plot)])
+		plt.show(block=False)
+		plt.pause(0.01)
 
 	def check_previous_processed(self):
 		lpFile = self.base_exp_path+"_linkprediction.csv"
