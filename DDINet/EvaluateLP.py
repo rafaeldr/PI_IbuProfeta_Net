@@ -94,8 +94,10 @@ class EvaluateLP:
 
 def main():
 	
-	version_old = "5.0.2"
+	version_old = "5.1.6"
 	version_new = "5.1.10"
+	print('Version OLD: '+str(version_old))
+	print('Version NEW: '+str(version_new))
 	
 	G_old = pre_load_net(version_old)
 	df_LP_old = pre_load_lp(version_old, G_old)
