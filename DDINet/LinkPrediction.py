@@ -229,9 +229,9 @@ class LinkPrediction:
 
 	def plot_lp_analysis(self):
 		fig_combined = plt.figure()
-		plt.ylabel("Prediction Value Normalized")
+		plt.ylabel("Predicted Value Normalized")
 		plt.xlabel("Rank")
-		plt.title("Combined Rank Plot LP Values")
+		plt.title("Normalized Rank Plot LP Values")
 		for alg in range(int(self.dfResult.shape[1]/3)):
 			# Some arithmethic to get the right columns
 			col = 3*alg
@@ -246,9 +246,11 @@ class LinkPrediction:
 			# Rank Plot Prediction Values
 			result_plot = self.dfResult.iloc[:,(col+2)]
 			plt.figure()
-			plt.plot(result_plot)
+			plt.plot(result_plot, linewidth=5)
+			plt.ylabel("Predicted Value")
+			plt.xlabel("Rank")
 			plt.title("Rank Plot LP Values - "+self.dfResult.columns[col+2])
-			plt.xlim([0, len(result_plot)])
+			#plt.xlim([-1, len(result_plot)])
 			plt.show(block=False)
 			plt.pause(0.01)
 
@@ -256,9 +258,19 @@ class LinkPrediction:
 			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
 			result_plot = rescale(result_plot)
 			plt.figure(fig_combined.number)
-			plt.plot(result_plot, label=self.dfResult.columns[col+2])
-			plt.xlim([0, len(result_plot)])
+			plt.plot(result_plot, label=self.dfResult.columns[col+2], linewidth=5)
+			#plt.xlim([-1, len(result_plot)])
+		one_percent_lim = len(result_plot)*0.01 # Top 1%
+		plt.axvline(x=one_percent_lim, linestyle='dashed', color='black', linewidth=1, label='Top 1%')
+		plt.axvline(x=5*one_percent_lim, linestyle='dashdot', color='black', linewidth=1, label='Top 5%')
 		plt.legend(loc='upper right', shadow=True)
+		plt.show(block=False)
+		plt.pause(0.01)
+
+		# Plot Adjusted for Top 1%
+		plt.title("Normalized Rank Plot LP Values for Top 1%")
+		min_lim = -one_percent_lim*0.01  
+		plt.xlim([min_lim, one_percent_lim])
 		plt.show(block=False)
 		plt.pause(0.01)
 
