@@ -237,11 +237,7 @@ class LinkPrediction:
 			col = 3*alg
 			
 			print('LP Analysis for Algorithm: '+self.dfResult.columns[col+2])
-			print('Mean: '+str(self.dfResult.iloc[:,(col+2)].mean()))
-			print('Median: '+str(self.dfResult.iloc[:,(col+2)].median()))
-			print('Max: '+str(self.dfResult.iloc[:,(col+2)].max()))
-			print('Min: '+str(self.dfResult.iloc[:,(col+2)].min()))
-			print('Std: '+str(self.dfResult.iloc[:,(col+2)].std()))
+			print_description(self.dfResult,col+2)
 
 			# Rank Plot Prediction Values
 			result_plot = self.dfResult.iloc[:,(col+2)]
@@ -257,6 +253,8 @@ class LinkPrediction:
 			# Normalize and Plot Together
 			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
 			result_plot = rescale(result_plot)
+			print('NORMALIZED Descriptors:')
+			print_description(result_plot)
 			plt.figure(fig_combined.number)
 			plt.plot(result_plot, label=self.dfResult.columns[col+2], linewidth=5)
 			#plt.xlim([-1, len(result_plot)])
@@ -329,3 +327,14 @@ def add_community_info(G, communities):
 	for c, v_set in enumerate(communities):
 		for v in v_set:
 			G.nodes[v]['community'] = c
+
+def print_description(dfResult, col = 0):
+	if isinstance(dfResult, pd.core.frame.DataFrame):
+		dfResult = dfResult.iloc[:,col]
+	elif isinstance(dfResult, pd.core.series.Series):
+		dfResult = dfResult
+	print('Mean: '+str(dfResult.mean()))
+	print('Median: '+str(dfResult.median()))
+	print('Max: '+str(dfResult.max()))
+	print('Min: '+str(dfResult.min()))
+	print('Std: '+str(dfResult.std()))
