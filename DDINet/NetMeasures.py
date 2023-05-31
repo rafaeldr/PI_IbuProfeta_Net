@@ -47,9 +47,6 @@ def characterize_network_from_net(G, outFileName):
 def characterize_network_from_file(edgelistfile):
     print('Generating Network '+edgelistfile)
     G = nx.read_edgelist(edgelistfile, delimiter=',', nodetype=int) # Read the network
-    #ax = plt.figure(figsize=(10, 10))
-    #nx.draw_networkx(G)
-    #plt.pause(0.01)
     characterize_network_from_net(G, edgelistfile)
 
 def plot_degree_analysis(G):
@@ -106,6 +103,7 @@ def check_free_scale(G):
     degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
     #fit = powerlaw.Fit(degree_sequence) 
     fit = powerlaw.Fit(degree_sequence, xmin=1)
+    print('Power-law check: ')
     print('alpha= '+str(fit.alpha)+'; sigma: '+str(fit.sigma))
 
     plt.figure()
@@ -114,13 +112,16 @@ def check_free_scale(G):
     plt.show(block=False)
     plt.pause(0.01)
     
-    # Small-worldness
-    nx.sigma(G)
-    nx.omega(G)
-    print('small-worldness')
-    print('sigma: '+str(nx.sigma(G)))
-    print('omega: '+str(nx.omega(G)))
-    
-    print('stop')
+    # Small-worldness (Hard Computation)  > 1 day
+    skip = True
+    if skip:
+        start = time.time()
+        nx.sigma(G) # check computational complexity
+        nx.omega(G)
+        print('Small-worldness check:')
+        print('sigma: '+str(nx.sigma(G)))
+        print('omega: '+str(nx.omega(G)))
+        end = time.time()
+        print('Small-worldness Calculated! Time: '+str(end-start))
 
     
