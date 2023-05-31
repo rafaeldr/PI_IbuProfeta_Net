@@ -116,11 +116,11 @@ def check_free_scale(G):
     skip = True
     if not skip:
         start = time.time()
-        nx.sigma(G) # check computational complexity
-        nx.omega(G)
+        sigma = nx.sigma(G) # check computational complexity
+        omega = nx.omega(G)
         print('Small-worldness check:')
-        print('sigma: '+str(nx.sigma(G)))
-        print('omega: '+str(nx.omega(G)))
+        print('sigma: '+str(sigma))
+        print('omega: '+str(omega))
         end = time.time()
         print('Small-worldness Calculated! Time: '+str(end-start))
 
