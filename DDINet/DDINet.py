@@ -15,6 +15,7 @@ def main():
 	if not isExist: os.makedirs(r"..\Exported")
 	isExist = os.path.exists(r"..\Exported\DrugBank")
 	if not isExist: os.makedirs(r"..\Exported\DrugBank")
+	plot_figures = True
 
 	# Single file processing mode
 	version = "5.1.10"
@@ -69,7 +70,7 @@ def main():
 	lp1.prepare_communities(comm)
 	lp1.predict()
 	
-	lp1.plot_lp_analysis()
+	if plot_figures: lp1.plot_lp_analysis()
 
 	lp1.export()
 	lp1.correlation_analysis()

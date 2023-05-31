@@ -229,15 +229,24 @@ class LinkPrediction:
 
 	def plot_lp_analysis(self):
 		fig_combined = plt.figure()
+		fig_combined_rank = plt.figure()
 		plt.ylabel("Predicted Value Normalized")
 		plt.xlabel("Rank")
 		plt.title("Normalized Rank Plot LP Values")
 		for alg in range(int(self.dfResult.shape[1]/3)):
+			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
+			
 			# Some arithmethic to get the right columns
 			col = 3*alg
 			
 			print('LP Analysis for Algorithm: '+self.dfResult.columns[col+2])
 			print_description(self.dfResult,col+2)
+
+			# Plot Positional Values (from Correlation)
+			result_plot = rescale(self.dfCorrelation.iloc[:,alg].rolling(int(self.dfCorrelation.shape[0]*0.01)).mean())
+			#result_plot = rescale(self.dfCorrelation.iloc[:,alg]) # Hard to interpret
+			plt.figure(fig_combined.number)
+			plt.plot(result_plot, label=self.dfResult.columns[col+2], linewidth=1)
 
 			# Rank Plot Prediction Values
 			result_plot = self.dfResult.iloc[:,(col+2)]
@@ -251,11 +260,10 @@ class LinkPrediction:
 			plt.pause(0.01)
 
 			# Normalize and Plot Together
-			rescale = lambda y: (y - np.min(y)) / (np.max(y) - np.min(y))
 			result_plot = rescale(result_plot)
 			print('NORMALIZED Descriptors:')
 			print_description(result_plot)
-			plt.figure(fig_combined.number)
+			plt.figure(fig_combined_rank.number)
 			plt.plot(result_plot, label=self.dfResult.columns[col+2], linewidth=5)
 			#plt.xlim([-1, len(result_plot)])
 		one_percent_lim = len(result_plot)*0.01 # Top 1%
@@ -269,6 +277,15 @@ class LinkPrediction:
 		plt.title("Normalized Rank Plot LP Values for Top 1%")
 		min_lim = -one_percent_lim*0.01  
 		plt.xlim([min_lim, one_percent_lim])
+		plt.show(block=False)
+		plt.pause(0.01)
+
+		# Parameters for Plot Positional Values (from Correlation)
+		plt.figure(fig_combined.number)
+		plt.title("Positional Values for All LP Algorithms (1% Moving Average)")
+		plt.ylabel("Predicted Value Normalized")
+		plt.xlabel("Position")
+		plt.legend(loc='upper right', shadow=True)
 		plt.show(block=False)
 		plt.pause(0.01)
 

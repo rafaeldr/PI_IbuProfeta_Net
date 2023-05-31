@@ -114,7 +114,7 @@ def check_free_scale(G):
     
     # Small-worldness (Hard Computation)  > 1 day
     skip = True
-    if skip:
+    if not skip:
         start = time.time()
         nx.sigma(G) # check computational complexity
         nx.omega(G)
