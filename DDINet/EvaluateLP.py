@@ -13,11 +13,11 @@ class EvaluateLP:
 	G_old -> Graph in which LP was applied
 	G_new -> Graph evolved in time, where LP will be evaluated
 	'''
-	def __init__(self, G_old, G_new, df_LP_old) -> None:
+	def __init__(self, G_old, G_new, df_LP_old, limit_to_top = 'new_edges') -> None:
 		self.G_old = G_old
 		self.G_new = G_new
 		self.df_LP_old = df_LP_old
-		self.process()
+		self.process(limit_to_top)
 		
 	def process(self, limit_to_top = 'new_edges'):
 
@@ -40,6 +40,10 @@ class EvaluateLP:
 			limit_to_top = len(self.df_LP_old)
 		elif limit_to_top == 'new_edges':
 			limit_to_top = len(edges_new)
+		elif limit_to_top == '1%':
+			limit_to_top = int(len(self.df_LP_old)*0.01)
+		elif limit_to_top == '5%':
+			limit_to_top = int(len(self.df_LP_old)*0.05)
 		
 		print('')
 		print('######### Link Prediction Evaluation Module #########')
@@ -64,24 +68,38 @@ class EvaluateLP:
 			max_score = self.df_LP_old.iloc[:,(col+2)].max()
 			min_score = self.df_LP_old.iloc[:,(col+2)].min()
 
-			for edge in edges_new:
-				counter += 1
-				if (counter % 10 == 0): print('Edge: {}/{} \r'.format(counter, len(edges_new)), end="")
+			if limit_to_top>=len(edges_new):
+				for edge in edges_new:
+					counter += 1
+					if (counter % 10 == 0): print('Edge: {}/{} \r'.format(counter, len(edges_new)), end="")
 				
-				id_LP_edge = np.where(self.df_LP_old.iloc[0:limit_to_top,col].isin([edge[0],edge[1]]) & 
-						              self.df_LP_old.iloc[0:limit_to_top,(col+1)].isin([edge[0],edge[1]]))[0]
-				if len(id_LP_edge) > 0:
-					int(id_LP_edge[0]) # should be only one
-					match = match + 1
-					# Get the LP score
-					score_LP = self.df_LP_old.iloc[id_LP_edge[0],(col+2)]
-					score_LP = (score_LP - min_score) / (max_score - min_score)
-					acc += score_LP
+					id_LP_edge = np.where(self.df_LP_old.iloc[0:limit_to_top,col].isin([edge[0],edge[1]]) & 
+										  self.df_LP_old.iloc[0:limit_to_top,(col+1)].isin([edge[0],edge[1]]))[0]
+					if len(id_LP_edge) > 0:
+						int(id_LP_edge[0]) # should be only one
+						match = match + 1
+						# Get the LP score
+						score_LP = self.df_LP_old.iloc[id_LP_edge[0],(col+2)]
+						score_LP = (score_LP - min_score) / (max_score - min_score)
+						acc += score_LP
+			else:
+				dfTopSearch = self.df_LP_old.iloc[0:limit_to_top,:]
+				for row in range(dfTopSearch.shape[0]):
+					counter += 1
+					if (counter % 10 == 0): print('Edge: {}/{} \r'.format(counter, limit_to_top), end="")
+					edge_go = (dfTopSearch.iloc[row,col], dfTopSearch.iloc[row,(col+1)])
+					edge_come = (dfTopSearch.iloc[row,col+1], dfTopSearch.iloc[row,(col)])
+					if (edge_go in edges_new) or (edge_come in edges_new):
+						match = match + 1
+						# Get the LP score
+						score_LP = dfTopSearch.iloc[row,(col+2)]
+						score_LP = (score_LP - min_score) / (max_score - min_score)
+						acc += score_LP
 			print()
 			print('')
 			print('Total matches: '+str(match))
 			print('Accumulated score: '+str(acc))
-			if limit_to_top>len(edges_new):
+			if limit_to_top>=len(edges_new):
 				print('Average score: '+str(acc/len(edges_new)))
 			else:
 				print('Average score: '+str(acc/limit_to_top))
@@ -104,7 +122,7 @@ def main():
 
 	G_new = pre_load_net(version_new)
 
-	eval_LP = EvaluateLP(G_old, G_new, df_LP_old)
+	eval_LP = EvaluateLP(G_old, G_new, df_LP_old, '5%')
 
 	print('Done!!!')
 
