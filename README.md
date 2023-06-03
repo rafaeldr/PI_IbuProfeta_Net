@@ -5,10 +5,10 @@ Maiores informações podem ser consultadas em nosso relatório técnico-cientí
 
 Título: <b>Predição de links em Redes de Interação Medicamentosa: Uma Breve Investigação na Detecção de Novas Interações</b>
 
-Link para o Relatório Técnico: <Após publicação>
+Link para o Relatório Técnico: https://doi.org/10.5281/zenodo.8000773
 
 Caso seja útil, favor citar:<br>
-<b>SUBSTITUIR APÓS PUBLICAÇÃO</b> HONORATO, A. M. et al. Consulta de Interações Medicamentosas: Análise de Dados do DrugBank e KEGG Drug para uma Solução Híbrida Aprimorada. [s.l.] Zenodo, 5 dez. 2022. DOI: https://doi.org/10.5281/zenodo.7450117. Disponível em: <https://zenodo.org/record/7450117>.
+HONORATO, A. M. et al. Predição de links em Redes de Interação Medicamentosa: Uma Breve Investigação na Detecção de Novas Interações. [s.l.] Zenodo, 2 jun. 2023. DOI: https://doi.org/10.5281/zenodo.8000773. Disponível em: https://zenodo.org/record/8000773.
 
 Esse projeto é parte de um projeto maior e incremental:<br>
 PI 1: https://github.com/rafaeldr/PI_MangaComLeite<br>
