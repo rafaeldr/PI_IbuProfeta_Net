@@ -18,7 +18,7 @@ def main():
 	plot_figures = True
 
 	# Single file processing mode
-	version = "5.1.10"
+	version = "5.1.2"
 	drugbank_file = os.path.join(r"..\DataSources\DrugBank", "{}.xml".format(version))
 
 

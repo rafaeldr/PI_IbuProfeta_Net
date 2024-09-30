@@ -42,8 +42,10 @@ class EvaluateLP:
 			limit_to_top = len(edges_new)
 		elif limit_to_top == '1%':
 			limit_to_top = int(len(self.df_LP_old)*0.01)
+			print('Top 1% Search')
 		elif limit_to_top == '5%':
 			limit_to_top = int(len(self.df_LP_old)*0.05)
+			print('Top 5% Search')
 		
 		print('')
 		print('######### Link Prediction Evaluation Module #########')
@@ -112,8 +114,8 @@ class EvaluateLP:
 
 def main():
 	
-	version_old = "5.1.6"
-	version_new = "5.1.10"
+	version_old = "5.1.1"
+	version_new = "5.1.2"
 	print('Version OLD: '+str(version_old))
 	print('Version NEW: '+str(version_new))
 	
@@ -122,7 +124,12 @@ def main():
 
 	G_new = pre_load_net(version_new)
 
-	eval_LP = EvaluateLP(G_old, G_new, df_LP_old, '5%')
+	limit_list = [10, 100, 1000, '1%', '5%', 'new_edges', 'full']
+	for l in limit_list:
+		print('#############################################')
+		print('Limit to TOP: '+str(l))
+		print('#############################################')
+		EvaluateLP(G_old, G_new, df_LP_old, l)
 
 	print('Done!!!')
 
